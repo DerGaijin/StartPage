@@ -1,0 +1,77 @@
+* {
+	padding: 0;
+	margin: 0;
+	box-sizing: border-box;
+}
+
+html {
+	background: url("Background.jpg");
+	background-color: #222;
+	background-size: cover;
+	background-position: center;
+	background-attachment: fixed;
+
+	font-family: Arial, Helvetica, sans-serif;
+	color: white;
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	height: 100vh;
+}
+
+#TimeDisplay,
+#DayDisplay,
+#DateDisplay {
+	font-size: 40px;
+	font-weight: bold;
+	padding-bottom: 10px;
+	text-align: center;
+}
+
+#DecryptionPassword {
+}
+
+#LinkList {
+	display: flex;
+	flex-wrap: wrap;
+}
+
+.LinkGroup {
+	width: 250px;
+
+	display: flex;
+	flex-direction: column;
+
+	padding: 10px;
+	margin: 25px;
+
+	background-color: #222;
+	border-radius: 15px;
+	box-shadow: 5px 5px 15px white;
+}
+
+.LinkGroupLabel {
+}
+
+.LinkItem {
+	text-decoration: none;
+	color: inherit;
+
+	display: flex;
+
+	border: 1px solid white;
+	padding: 5px;
+	margin-bottom: 10px;
+}
+
+.LinkIcon {
+	width: 25px;
+	height: 25px;
+}
+
+.LinkLabel {
+	padding-left: 10px;
+	font-size: 25px;
+}
