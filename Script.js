@@ -10,10 +10,15 @@ document.addEventListener("DOMContentLoaded", () => {
 			LoadLinkGroups();
 
 			if (IsInPrivate) {
-				// Do Private Stuff
+				var TogglePrivateLinksButton = document.createElement("button");
+				TogglePrivateLinksButton.id = "TogglePrivateLinksButton";
+				TogglePrivateLinksButton.innerText = "Toggle Private Links";
+				TogglePrivateLinksButton.onclick = TogglePrivateLinks;
+				document.body.appendChild(TogglePrivateLinksButton);
 			}
 		})
 		.catch(function (error) {
+			console.error(error);
 			LoadLinkGroups();
 		});
 });
@@ -23,54 +28,60 @@ function LoadLinkGroups() {
 	LinkList.innerHTML = "";
 
 	for (var LinkGroup of LinkGroups) {
-		var IsEncrypted = "IsEncoded" in LinkGroup && LinkGroup["IsEncrypted"];
+		var IsEncrypted = "IsEncrypted" in LinkGroup && LinkGroup["IsEncrypted"];
 		var IsPrivate = "IsPrivate" in LinkGroup && LinkGroup["IsPrivate"];
 
 		if (IsPrivate && !IsInPrivate) {
 			continue;
 		}
 
-		var GroupElement = document.createElement("ul");
+		var GroupElement = document.createElement("div");
 		GroupElement.className = "LinkGroup";
+		if (IsPrivate) {
+			GroupElement.classList.add("LinkGroup_Private");
+			GroupElement.classList.add("LinkGroup_Hidden");
+		}
 		LinkList.appendChild(GroupElement);
 
 		if ("Label" in LinkGroup) {
 			var GroupLabel = document.createElement("p");
 			GroupLabel.className = "LinkGroupLabel";
-			GroupLabel.innerText = LinkGroup.Label;
+			GroupLabel.innerText = IsEncrypted ? Decrypt(LinkGroup.Label) : LinkGroup.Label;
 			GroupElement.appendChild(GroupLabel);
 		}
 
 		if ("Links" in LinkGroup) {
+			var LinkItems = document.createElement("ul");
+			LinkItems.className = "LinkItems";
+			GroupElement.appendChild(LinkItems);
+
 			var Links = LinkGroup["Links"];
 			for (var Link of Links) {
 				var LinkItem = document.createElement("a");
 				LinkItem.className = "LinkItem";
 
 				if ("URL" in Link) {
-					// Decrypt Encrypted URLs
-					LinkItem.href = Link["URL"];
+					LinkItem.href = IsEncrypted ? Decrypt(Link.URL) : Link.URL;
 				}
 
 				var IconURL = LinkItem.href;
-				if ("Icon" in Link) {
-					IconURL = Link["Icon"];
-				}
-
 				var LinkIcon = document.createElement("img");
 				LinkIcon.className = "LinkIcon";
-				LinkIcon.src = "https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=" + IconURL + "&size=256";
+				if ("Icon" in Link) {
+					LinkIcon.src = IsEncrypted ? Decrypt(Link.Icon) : Link.Icon;
+				} else {
+					LinkIcon.src = "https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=" + IconURL + "&size=256";
+				}
 				LinkItem.appendChild(LinkIcon);
 
 				if ("Label" in Link) {
 					var LinkLabel = document.createElement("p");
 					LinkLabel.className = "LinkLabel";
-					// Decrypt Encrypted Labels
-					LinkLabel.innerText = Link["Label"];
+					LinkLabel.innerText = IsEncrypted ? Decrypt(Link.Label) : Link.Label;
 					LinkItem.appendChild(LinkLabel);
 				}
 
-				GroupElement.appendChild(LinkItem);
+				LinkItems.appendChild(LinkItem);
 			}
 		}
 	}
@@ -108,12 +119,32 @@ function Update() {
 	document.getElementById("DateDisplay").innerText = CurrDate;
 }
 
+function TogglePrivateLinks() {
+	var PrivateLinkGroups = document.getElementsByClassName("LinkGroup_Private");
+
+	for (const Element of PrivateLinkGroups) {
+		Element.classList.toggle("LinkGroup_Hidden");
+	}
+}
+
 function Decrypt(Value) {
-	return Value;
+	var Key = localStorage.getItem("EncryptionKey");
+	if (Key == null) {
+		Key = "Default";
+	}
+	var Decrypted = CryptoJS.AES.decrypt(Value, Key);
+	return Decrypted ? Decrypted.toString(CryptoJS.enc.Utf8) : Value;
 }
 
 function Encrypt(Value) {
-	return Value;
+	var Key = localStorage.getItem("EncryptionKey");
+	if (Key == null) {
+		Key = "Default";
+	}
+	var Encrypted = CryptoJS.AES.encrypt(Value, Key);
+	return Encrypted ? Encrypted.toString() : Value;
 }
 
-function DecryptionPasswordChange() {}
+function SetEncryptionKey(Key) {
+	localStorage.setItem("EncryptionKey", Key);
+}

@@ -35,43 +35,154 @@ html {
 
 #LinkList {
 	display: flex;
+	justify-content: center;
 	flex-wrap: wrap;
 }
 
 .LinkGroup {
-	width: 250px;
+	width: auto;
 
-	display: flex;
-	flex-direction: column;
-
-	padding: 10px;
 	margin: 25px;
+}
 
-	background-color: #222;
-	border-radius: 15px;
-	box-shadow: 5px 5px 15px white;
+.LinkGroup_Hidden {
+	display: none;
 }
 
 .LinkGroupLabel {
+	display: none; /* Currently Disabled */
+	text-align: center;
+
+	border-bottom: 2px solid white;
+	padding: 5px;
+	margin-bottom: 5px;
+
+	font-size: 25px;
+}
+
+.LinkItems {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
 }
 
 .LinkItem {
+	width: 120px;
+	height: 120px;
+
 	text-decoration: none;
 	color: inherit;
 
 	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
 
-	border: 1px solid white;
-	padding: 5px;
-	margin-bottom: 10px;
+	margin: 20px;
 }
 
+.LinkItem {
+	border-radius: 20px;
+	background: linear-gradient(135deg, #222, #1d1d1d);
+	color: white;
+	font-size: 24px;
+	border: none;
+	cursor: pointer;
+	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+	transition: all 0.3s ease-in-out;
+	outline: none;
+	position: relative;
+	overflow: hidden;
+}
+
+.LinkItem::before {
+	content: "";
+	position: absolute;
+	width: 120%;
+	height: 120%;
+	background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 10%, transparent 70%);
+	top: -50%;
+	left: -50%;
+	transition: transform 0.4s ease;
+}
+
+.LinkItem:hover::before {
+	transform: scale(1.8);
+}
+
+.LinkItem:hover {
+	transform: translateY(-3px);
+	box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+}
+
+.LinkItem:active {
+	transform: translateY(1px);
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/*
+.LinkItem {
+	padding: 12px 16px;
+	border-radius: 10px;
+	background: #222;
+	color: #b0b0b0;
+	font-size: 18px;
+	font-weight: 500;
+	border: none;
+	cursor: pointer;
+	transition: all 0.3s ease-in-out;
+	outline: none;
+	text-decoration: none;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+	position: relative;
+	overflow: hidden;
+}
+
+.LinkItem:hover {
+	background: #2a2a2a;
+	color: #ffffff;
+	box-shadow: 0 6px 15px rgba(255, 255, 255, 0.1);
+	transform: translateY(-2px);
+}
+
+.LinkItem:active {
+	transform: translateY(1px);
+	box-shadow: 0 2px 5px rgba(255, 255, 255, 0.1);
+}
+*/
+
 .LinkIcon {
-	width: 25px;
-	height: 25px;
+	width: 60px;
+	height: 60px;
 }
 
 .LinkLabel {
-	padding-left: 10px;
-	font-size: 25px;
+	padding-top: 5px;
+	font-size: 18px;
+}
+
+#TogglePrivateLinksButton {
+	width: 400px;
+	position: absolute;
+	bottom: 0;
+	left: 50%;
+	right: 50%;
+	transform: translateX(-50%);
+
+	padding: 5px;
+	margin: 5px;
+
+	border: none;
+	background: none;
+	outline: none;
+
+	color: inherit;
+	font-weight: bold;
+
+	border: 2px solid white;
+	border-radius: 50px;
+
+	cursor: pointer;
+	background-color: rgba(150, 150, 150, 0.2);
+
+	opacity: 0.05;
 }
