@@ -94,6 +94,10 @@ var LinkGroups = [
 				Label: "U2FsdGVkX19bgVlxzA8P61K1O17fWEg8HZRs7E6fU00=",
 				URL: "U2FsdGVkX1/XWku6dndmFxMoXf9IJ6DOAW8VZjet4Nzhhh0JSK1rrqJtRVCyX8ma38QF5vfERlqBoCzNQ4c0MA==",
 			},
+			{
+				Label: "U2FsdGVkX1+6ThnloUkWk5Hvc77Df2U2uU5A/Nh8V18=",
+				URL: "U2FsdGVkX1+XAopQqerNG9WXMWQlLa1L+LtTVC3bipa/4M6h1ipB8GYAjmlRfr96",
+			}
 		],
 	},
 ];
