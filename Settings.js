@@ -1,4 +1,4 @@
-var LinkGroups = [
+const LinkGroups = [
 	{
 		Label: "Google",
 		Links: [
@@ -67,3 +67,8 @@ var LinkGroups = [
 		Links: [],
 	},
 ];
+
+const Aurum = {
+	IP: "0.0.0.0",
+	Port: 0,
+};

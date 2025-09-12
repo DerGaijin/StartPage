@@ -30,9 +30,6 @@ html {
 	text-align: center;
 }
 
-#DecryptionPassword {
-}
-
 #LinkList {
 	display: flex;
 	justify-content: center;
@@ -43,10 +40,6 @@ html {
 	width: auto;
 
 	margin: 25px;
-}
-
-.LinkGroup_Hidden {
-	display: none;
 }
 
 .LinkGroupLabel {
@@ -160,29 +153,61 @@ html {
 	font-size: 18px;
 }
 
-#TogglePrivateLinksButton {
-	width: 400px;
-	position: absolute;
-	bottom: 0;
-	left: 50%;
-	right: 50%;
-	transform: translateX(-50%);
+#AurumList {
+	list-style-type: none;
+	display: flex;
+	justify-content: center;
+	flex-wrap: wrap;
+}
 
-	padding: 5px;
+.AurumItem {
+	padding: 10px;
 	margin: 5px;
+	width: 200px;
 
-	border: none;
-	background: none;
-	outline: none;
+	background: #222;
+	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+	border: 1px solid white;
+	border-radius: 20px;
+}
 
-	color: inherit;
+.AurumItem_Profit {
+	border-color: green;
+}
+
+.AurumItem_Loss {
+	border-color: red;
+}
+
+.AurumName {
+	text-align: center;
+	border-bottom: 2px solid white;
+	margin-bottom: 5px;
+}
+
+.AurumRow {
+	display: flex;
+	justify-content: space-between;
+}
+
+.AurumText2::after {
+	content: " $";
+}
+
+#AurumOverview {
+	display: flex;
+	justify-content: space-evenly;
+    text-align: center;
+
+	padding: 10px;
+	margin: 10px;
+
+	background: #222;
+	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+	border-radius: 20px;
+}
+
+.AurumOverview_Text {
 	font-weight: bold;
-
-	border: 2px solid white;
-	border-radius: 50px;
-
-	cursor: pointer;
-	background-color: rgba(150, 150, 150, 0.2);
-
-	opacity: 0.05;
+	font-size: 16px;
 }
