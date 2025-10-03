@@ -67,8 +67,3 @@ const LinkGroups = [
 		Links: [],
 	},
 ];
-
-const Aurum = {
-	IP: "0.0.0.0",
-	Port: 0,
-};

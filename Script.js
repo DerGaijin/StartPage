@@ -91,26 +91,43 @@ function UpdateLinks() {
 }
 
 function UpdateAurum() {
+	const AurumEndpoint = localStorage.getItem("Aurum");
+	if (AurumEndpoint != null) {
+		var AurumRequest = new XMLHttpRequest();
+		AurumRequest.open("GET", "http://" + AurumEndpoint, true);
+		AurumRequest.onreadystatechange = function () {
+			if (AurumRequest.readyState === 4 && AurumRequest.status === 200) {
+				try {
+					const Data = JSON.parse(AurumRequest.responseText);
+					UpdateAurumData(Data);
+				} catch (e) {}
+			}
+		};
+		AurumRequest.send();
+	}
+	/*
 	const AurumData = {
-		Overview: {
-			Balance: 0,
-			Equity: 0,
-			Margin: 0,
-			Positions: 0,
-		},
+		Balance: 10,
+		Equity: 20,
+		FreeMargin: 30,
+		Positions: 12,
 		Experts: [
-			{ Name: "Total", "09.2025": 0, "08.2025": 0, "07.2025": 0, "06.2025": 0 },
-			{ Name: "Aurum Expert 01", "09.2025": 0, "08.2025": 0, "07.2025": 0, "06.2025": 0 },
-			{ Name: "Aurum Expert 02", "09.2025": 0, "08.2025": 0, "07.2025": 0, "06.2025": 0 },
-			{ Name: "Aurum Expert 03", "09.2025": 0, "08.2025": 0, "07.2025": 0, "06.2025": 0 },
-			{ Name: "Aurum Expert 04", "09.2025": 0, "08.2025": 0, "07.2025": 0, "06.2025": 0 },
+			{ Label: "Aurum Expert 01", Profits: [1, 1, 2, 3] },
+			{ Label: "Aurum Expert 02", Profits: [0, 1, 2, 3] },
+			{ Label: "Aurum Expert 03", Profits: [0, 1, 2, 3] },
+			{ Label: "Aurum Expert 04", Profits: [0, 1, 2, 3] },
 		],
 	};
+	UpdateAurumData(AurumData);
+    */
+}
 
-	document.getElementById("AurumOverview_Balance").innerText = "Balance: " + AurumData.Overview.Balance + " $";
-	document.getElementById("AurumOverview_Equity").innerText = "Equity: " + AurumData.Overview.Equity + " $";
-	document.getElementById("AurumOverview_Margin").innerText = "Free Margin: " + AurumData.Overview.Margin + " $";
-	document.getElementById("AurumOverview_Positions").innerText = "Positions: " + AurumData.Overview.Positions;
+function UpdateAurumData(AurumData) {
+	// Overview
+	document.getElementById("AurumOverview_Balance").innerText = "Balance: " + AurumData.Balance + " $";
+	document.getElementById("AurumOverview_Equity").innerText = "Equity: " + AurumData.Equity + " $";
+	document.getElementById("AurumOverview_Margin").innerText = "Free Margin: " + AurumData.FreeMargin + " $";
+	document.getElementById("AurumOverview_Positions").innerText = "Positions: " + AurumData.Positions;
 
 	var AurumList = document.getElementById("AurumList");
 	AurumList.innerHTML = "";
@@ -131,6 +148,65 @@ function UpdateAurum() {
 		Row.appendChild(Text2Elem);
 	}
 
+	function GetMonth(offset) {
+		const now = new Date();
+		// shift months backwards by offset
+		let year = now.getFullYear();
+		let month = now.getMonth() - offset; // JS months: 0=Jan ... 11=Dec
+
+		// adjust year/month if we go below 0 or above 11
+		while (month < 0) {
+			month += 12;
+			year -= 1;
+		}
+		while (month > 11) {
+			month -= 12;
+			year += 1;
+		}
+
+		// format as MM.YYYY
+		let monthStr = String(month + 1).padStart(2, "0");
+		return `${monthStr}.${year}`;
+	}
+
+	// Total
+	var TotalElem = document.createElement("li");
+	TotalElem.className = "AurumItem";
+	AurumList.appendChild(TotalElem);
+	var TotalLabel = document.createElement("h4");
+	TotalLabel.className = "AurumName";
+	TotalLabel.innerText = "Total";
+	TotalElem.appendChild(TotalLabel);
+
+	var TotalIndex = 0;
+	while (true) {
+		var Found = false;
+		var Profit = 0;
+		for (var Item of AurumData.Experts) {
+			if (TotalIndex < Item.Profits.length) {
+				Found = true;
+				Profit += Item.Profits[TotalIndex];
+			}
+		}
+
+		if (!Found) {
+			break;
+		}
+
+		if (TotalIndex == 0) {
+			if (Profit > 0) {
+				TotalElem.classList.add("AurumItem_Profit");
+			}
+			if (Profit < 0) {
+				TotalElem.classList.add("AurumItem_Loss");
+			}
+		}
+
+		AddRow(TotalElem, GetMonth(TotalIndex), Profit);
+		TotalIndex += 1;
+	}
+
+	// Experts
 	for (var Item of AurumData.Experts) {
 		var Elem = document.createElement("li");
 		Elem.className = "AurumItem";
@@ -138,23 +214,20 @@ function UpdateAurum() {
 
 		var Name = document.createElement("h4");
 		Name.className = "AurumName";
-		Name.innerText = Item.Name;
+		Name.innerText = Item.Label;
 		Elem.appendChild(Name);
 
 		var Idx = 0;
-		for (const [Key, Value] of Object.entries(Item)) {
+		for (var Profit of Item.Profits) {
 			if (Idx == 0) {
-				Idx++;
-				continue;
-			} else if (Idx == 1) {
-				if (Value > 0) {
+				if (Profit > 0) {
 					Elem.classList.add("AurumItem_Profit");
 				}
-				if (Value < 0) {
+				if (Profit < 0) {
 					Elem.classList.add("AurumItem_Loss");
 				}
 			}
-			AddRow(Elem, Key, Value);
+			AddRow(Elem, GetMonth(Idx), Profit);
 			Idx += 1;
 		}
 	}
