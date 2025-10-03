@@ -94,7 +94,7 @@ function UpdateAurum() {
 	const AurumEndpoint = localStorage.getItem("Aurum");
 	if (AurumEndpoint != null) {
 		var AurumRequest = new XMLHttpRequest();
-		AurumRequest.open("GET", "http://" + AurumEndpoint, true);
+		AurumRequest.open("GET", AurumEndpoint, true);
 		AurumRequest.onreadystatechange = function () {
 			if (AurumRequest.readyState === 4 && AurumRequest.status === 200) {
 				try {
