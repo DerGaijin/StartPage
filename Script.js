@@ -128,24 +128,30 @@ function UpdateAurumData(AurumData) {
 	document.getElementById("AurumOverview_Equity").innerText = "Equity: " + AurumData.Equity + " $";
 	document.getElementById("AurumOverview_Margin").innerText = "Free Margin: " + AurumData.FreeMargin + " $";
 	document.getElementById("AurumOverview_Positions").innerText = "Positions: " + AurumData.Positions;
+	document.getElementById("AurumOverview_Profit").innerText = "Profit: " + AurumData.Profit + " $";
 
 	var AurumList = document.getElementById("AurumList");
 	AurumList.innerHTML = "";
 
-	function AddRow(Elem, Text1, Text2) {
+	function AddRow(Elem, Month, Profit, Trades) {
 		var Row = document.createElement("div");
 		Row.className = "AurumRow";
 		Elem.appendChild(Row);
 
 		var Text1Elem = document.createElement("p");
 		Text1Elem.className = "AurumText1";
-		Text1Elem.innerText = Text1;
+		Text1Elem.innerText = Month;
 		Row.appendChild(Text1Elem);
 
 		var Text2Elem = document.createElement("p");
 		Text2Elem.className = "AurumText2";
-		Text2Elem.innerText = Text2;
+		Text2Elem.innerText = parseFloat(Profit).toFixed(2);
 		Row.appendChild(Text2Elem);
+
+		var Text3Elem = document.createElement("p");
+		Text3Elem.className = "AurumText3";
+		Text3Elem.innerText = Trades;
+		Row.appendChild(Text3Elem);
 	}
 
 	function GetMonth(offset) {
@@ -182,10 +188,12 @@ function UpdateAurumData(AurumData) {
 	while (true) {
 		var Found = false;
 		var Profit = 0;
+        var Trades = 0;
 		for (var Item of AurumData.Experts) {
-			if (TotalIndex < Item.Profits.length) {
+			if (TotalIndex < Item.Months.length) {
 				Found = true;
-				Profit += Item.Profits[TotalIndex];
+				Profit += Item.Months[TotalIndex].Profit;
+				Trades += Item.Months[TotalIndex].Trades;
 			}
 		}
 
@@ -202,7 +210,7 @@ function UpdateAurumData(AurumData) {
 			}
 		}
 
-		AddRow(TotalElem, GetMonth(TotalIndex), Profit);
+		AddRow(TotalElem, GetMonth(TotalIndex), Profit, Trades);
 		TotalIndex += 1;
 	}
 
@@ -218,16 +226,16 @@ function UpdateAurumData(AurumData) {
 		Elem.appendChild(Name);
 
 		var Idx = 0;
-		for (var Profit of Item.Profits) {
+		for (var Month of Item.Months) {
 			if (Idx == 0) {
-				if (Profit > 0) {
+				if (Month.Profit > 0) {
 					Elem.classList.add("AurumItem_Profit");
 				}
-				if (Profit < 0) {
+				if (Month.Profit < 0) {
 					Elem.classList.add("AurumItem_Loss");
 				}
 			}
-			AddRow(Elem, GetMonth(Idx), Profit);
+			AddRow(Elem, GetMonth(Idx), Month.Profit, Month.Trades);
 			Idx += 1;
 		}
 	}
