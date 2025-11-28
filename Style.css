@@ -191,7 +191,7 @@ html {
 }
 
 .AurumText2::after {
-	content: " $";
+	content: " €";
 }
 
 #AurumOverview {
