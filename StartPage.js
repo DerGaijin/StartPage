@@ -199,110 +199,120 @@ function UpdateAurum() {
     return;
   }
 
-  var Account = DoRequest(Endpoint + "/account_info");
-  var Experts = DoRequest(Endpoint + "/experts");
-  var Positions = DoRequest(Endpoint + "/positions_get");
-  var Orders = DoRequest(Endpoint + "/orders_get");
-
-  if (Account == null) {
-    return;
+  const PAccount = fetch(Endpoint + "/account_info");
+  const PExperts = fetch(Endpoint + "/experts");
+  const PPositions = fetch(Endpoint + "/positions_get");
+  const POrders = fetch(Endpoint + "/orders_get");
+  var PDeals = [];
+  var Today = new Date();
+  for (let Idx = 0; Idx < 4; Idx++) {
+    var MonthDate = new Date(Today.getFullYear(), Today.getMonth() - Idx);
+    const StartParam = new Date(
+      MonthDate.getFullYear(),
+      MonthDate.getMonth(),
+      1,
+      0,
+      0,
+      0,
+      0
+    ).toISOString();
+    const StopParam = new Date(
+      MonthDate.getFullYear(),
+      MonthDate.getMonth() + 1,
+      0,
+      23,
+      59,
+      59,
+      999
+    ).toISOString();
+    var Deals = fetch(
+      Endpoint + "/history_deals_get?Start=" + StartParam + "&Stop=" + StopParam
+    );
+    PDeals.push(Deals);
   }
 
-  document.getElementById("Aurum").classList.remove("hidden");
-  document.getElementById("Aurum_Balance").innerText =
-    "Balance: " + PrettyPrice(Account.balance, false);
-  document.getElementById("Aurum_Equity").innerText =
-    "Equity: " + PrettyPrice(Account.equity, false);
-  document.getElementById("Aurum_Profit").innerText =
-    "Profit: " + PrettyPrice(Account.profit);
-  document.getElementById("Aurum_Positions").innerText =
-    "Positions: " + Positions.length;
-  document.getElementById("Aurum_Orders").innerText =
-    "Orders: " + Orders.length;
-  document.getElementById("Aurum_Insight").href = Endpoint;
-
-  for (const Expert of Experts) {
-    var ExpertElem = document.createElement("li");
-    ExpertElem.className = "ExpertCard min-w-40 p-2 border";
-    AurumExperts.appendChild(ExpertElem);
-
-    var NameElem = document.createElement("h3");
-    NameElem.className = "text-center";
-    NameElem.innerText = Expert.Name;
-    ExpertElem.appendChild(NameElem);
-
-    function AddMonthRow(Month, Profit) {
-      var Row = document.createElement("div");
-      Row.className = "flex justify-between";
-      ExpertElem.appendChild(Row);
-
-      var Elem1 = document.createElement("p");
-      Elem1.innerText = Month;
-      Row.appendChild(Elem1);
-
-      var Elem2 = document.createElement("p");
-      Elem2.innerText = PrettyPrice(Profit);
-      Row.appendChild(Elem2);
-
-      if (Profit > 0) {
-        Elem2.classList.add("text-green-500");
-      } else if (Profit < 0) {
-        Elem2.classList.add("text-red-500");
+  Promise.all([PAccount, PExperts, PPositions, POrders, ...PDeals]).then(
+    async (Values) => {
+      var Account = await Values[0].json();
+      var Experts = await Values[1].json();
+      var Positions = await Values[2].json();
+      var Orders = await Values[3].json();
+      var MonthlyDeals = [];
+      for (var Idx = 4; Idx < Values.length; Idx++) {
+        MonthlyDeals.push(await Values[Idx].json());
       }
-    }
 
-    var Today = new Date();
-    for (let Idx = 0; Idx < 4; Idx++) {
-      var MonthDate = new Date(Today.getFullYear(), Today.getMonth() - Idx);
+      document.getElementById("Aurum").classList.remove("hidden");
+      document.getElementById("Aurum_Balance").innerText =
+        "Balance: " + PrettyPrice(Account.balance, false);
+      document.getElementById("Aurum_Equity").innerText =
+        "Equity: " + PrettyPrice(Account.equity, false);
+      document.getElementById("Aurum_Profit").innerText =
+        "Profit: " + PrettyPrice(Account.profit);
+      document.getElementById("Aurum_Positions").innerText =
+        "Positions: " + Positions.length;
+      document.getElementById("Aurum_Orders").innerText =
+        "Orders: " + Orders.length;
+      document.getElementById("Aurum_Insight").href = Endpoint;
 
-      var Profit = 0;
-      if (Idx == 0) {
-        for (const Position of Positions) {
-          if (Position.magic == Expert.MagicNumber) {
-            Profit += Position.profit + Position.swap;
+      for (const Expert of Experts) {
+        var ExpertElem = document.createElement("li");
+        ExpertElem.className = "ExpertCard min-w-40 p-2 border";
+        AurumExperts.appendChild(ExpertElem);
+
+        var NameElem = document.createElement("h3");
+        NameElem.className = "text-center";
+        NameElem.innerText = Expert.Name;
+        ExpertElem.appendChild(NameElem);
+
+        function AddMonthRow(Month, Profit) {
+          var Row = document.createElement("div");
+          Row.className = "flex justify-between";
+          ExpertElem.appendChild(Row);
+
+          var Elem1 = document.createElement("p");
+          Elem1.innerText = Month;
+          Row.appendChild(Elem1);
+
+          var Elem2 = document.createElement("p");
+          Elem2.innerText = PrettyPrice(Profit);
+          Row.appendChild(Elem2);
+
+          if (Profit > 0) {
+            Elem2.classList.add("text-green-500");
+          } else if (Profit < 0) {
+            Elem2.classList.add("text-red-500");
           }
         }
-      }
 
-      const StartParam = new Date(
-        MonthDate.getFullYear(),
-        MonthDate.getMonth(),
-        1,
-        0,
-        0,
-        0,
-        0
-      ).toISOString();
-      const StopParam = new Date(
-        MonthDate.getFullYear(),
-        MonthDate.getMonth() + 1,
-        0,
-        23,
-        59,
-        59,
-        999
-      ).toISOString();
-      var Deals = DoRequest(
-        Endpoint +
-          "/history_deals_get?Start=" +
-          StartParam +
-          "&Stop=" +
-          StopParam
-      );
+        var Today = new Date();
+        for (let Idx = 0; Idx < 4; Idx++) {
+          var MonthDate = new Date(Today.getFullYear(), Today.getMonth() - Idx);
 
-      for (const Deal of Deals) {
-        if (Deal.magic == Expert.MagicNumber) {
-          Profit += Deal.profit + Deal.swap + Deal.commission;
+          var Profit = 0;
+          if (Idx == 0) {
+            for (const Position of Positions) {
+              if (Position.magic == Expert.MagicNumber) {
+                Profit += Position.profit + Position.swap;
+              }
+            }
+          }
+
+          for (const Deal of MonthlyDeals[Idx]) {
+            if (Deal.magic == Expert.MagicNumber) {
+              Profit += Deal.profit + Deal.swap + Deal.commission;
+            }
+          }
+
+          AddMonthRow(
+            (MonthDate.getMonth() + 1 <= 9 ? "0" : "") +
+              (MonthDate.getMonth() + 1) +
+              "." +
+              MonthDate.getFullYear(),
+            Profit
+          );
         }
       }
-
-      AddMonthRow(
-        (MonthDate.getMonth() + 1 <= 9 ? "0" : "") +
-          (MonthDate.getMonth() + 1) +
-          "." +
-          MonthDate.getFullYear(),
-        Profit
-      );
     }
-  }
+  );
 }
