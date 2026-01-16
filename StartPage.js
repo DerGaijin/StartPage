@@ -140,33 +140,33 @@ function UpdateLinks() {
 
   for (var LinkGroup of Content.Links) {
     var GroupElement = document.createElement("div");
-    GroupElement.className = "LinkGroup";
+    GroupElement.className = "mx-5";
     LinkList.appendChild(GroupElement);
 
     if ("Label" in LinkGroup) {
       var GroupLabel = document.createElement("p");
-      GroupLabel.className = "LinkGroupLabel";
+      GroupLabel.className = "w-full mb-2 text-xl text-center hidden";
       GroupLabel.innerText = LinkGroup.Label;
       GroupElement.appendChild(GroupLabel);
     }
 
     if ("Links" in LinkGroup) {
       var LinkItems = document.createElement("ul");
-      LinkItems.className = "LinkItems";
+      LinkItems.className = "grid grid-cols-2 gap-4";
       GroupElement.appendChild(LinkItems);
 
       var Links = LinkGroup["Links"];
       for (var Link of Links) {
         var LinkItem = document.createElement("a");
-        LinkItem.className = "LinkItem";
-
+        LinkItem.className =
+          "LinkItem w-25 h-25 flex flex-col items-center justify-center";
         if ("URL" in Link) {
           LinkItem.href = Link.URL;
         }
 
         var IconURL = LinkItem.href;
         var LinkIcon = document.createElement("img");
-        LinkIcon.className = "LinkIcon";
+        LinkIcon.className = "w-12 h-12";
         if ("Icon" in Link) {
           LinkIcon.src = Link.Icon;
         } else {
@@ -179,7 +179,7 @@ function UpdateLinks() {
 
         if ("Label" in Link) {
           var LinkLabel = document.createElement("p");
-          LinkLabel.className = "LinkLabel";
+          LinkLabel.className = "";
           LinkLabel.innerText = Link.Label;
           LinkItem.appendChild(LinkLabel);
         }
@@ -253,7 +253,8 @@ function UpdateAurum() {
         "Positions: " + Positions.length;
       document.getElementById("Aurum_Orders").innerText =
         "Orders: " + Orders.length;
-      document.getElementById("Aurum_Insight").href = Endpoint + "/Insight.html";
+      document.getElementById("Aurum_Insight").href =
+        Endpoint + "/Insight.html";
 
       for (const Expert of Experts) {
         var ExpertElem = document.createElement("li");

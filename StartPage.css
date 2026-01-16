@@ -8,48 +8,10 @@ html {
   height: 100vh;
 }
 
-.LinkGroup {
-  width: auto;
-
-  margin: 25px;
-}
-
-.LinkGroupLabel {
-  display: none; /* Currently Disabled */
-  text-align: center;
-
-  border-bottom: 2px solid white;
-  padding: 5px;
-  margin-bottom: 5px;
-
-  font-size: 25px;
-}
-
-.LinkItems {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-}
-
-.LinkItem {
-  width: 100px;
-  height: 100px;
-
-  text-decoration: none;
-  color: inherit;
-
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-
-  margin: 20px;
-}
-
 .LinkItem {
   border-radius: 20px;
   background: linear-gradient(135deg, #222, #1d1d1d);
   color: white;
-  font-size: 24px;
   border: none;
   cursor: pointer;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
@@ -86,16 +48,6 @@ html {
 .LinkItem:active {
   transform: translateY(1px);
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-}
-
-.LinkIcon {
-  width: 40px;
-  height: 40px;
-}
-
-.LinkLabel {
-  padding-top: 5px;
-  font-size: 18px;
 }
 
 .ExpertCard {
