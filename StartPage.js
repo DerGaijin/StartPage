@@ -253,7 +253,7 @@ function UpdateAurum() {
         "Positions: " + Positions.length;
       document.getElementById("Aurum_Orders").innerText =
         "Orders: " + Orders.length;
-      document.getElementById("Aurum_Insight").href = Endpoint;
+      document.getElementById("Aurum_Insight").href = Endpoint + "/Insight.html";
 
       for (const Expert of Experts) {
         var ExpertElem = document.createElement("li");

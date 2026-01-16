@@ -1,29 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>DerGaijin's - Startpage</title>
-		<script src="Settings.js"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js" integrity="sha256-/H4YS+7aYb9kJ5OKhFYPUjSJdrtV6AeyJOtTkw6X72o=" crossorigin="anonymous"></script>
-		<script src="Script.js"></script>
-		<link rel="stylesheet" href="Style.css" />
-	</head>
-	<body>
-		<p id="TimeDisplay">00:00:00</p>
-		<p id="DayDisplay">Freitag</p>
-		<p id="DateDisplay">00.00.000</p>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DerGaiin's Startpage</title>
 
-		<ul id="LinkList"></ul>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss"></style>
 
-		<div id="AurumOverview">
-			<p id="AurumOverview_Balance" class="AurumOverview_Text">Balance: 0 $</p>
-			<p id="AurumOverview_Equity" class="AurumOverview_Text">Equity: 0 $</p>
-			<p id="AurumOverview_Margin" class="AurumOverview_Text">Free Margin: 0 $</p>
-			<p id="AurumOverview_Profit" class="AurumOverview_Text">Profit: 0</p>
-			<p id="AurumOverview_Positions" class="AurumOverview_Text">Positions: 0</p>
-		</div>
+    <!-- Font Awesome -->
+    <script src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/js/all.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/fontawesome.min.css"
+    />
 
-		<ul id="AurumList"></ul>
-	</body>
+    <!-- Scripts and Style -->
+    <script src="StartPage.js"></script>
+    <link rel="stylesheet" href="StartPage.css" />
+  </head>
+  <body class="flex flex-col h-full items-center justify-center text-white">
+    <p id="Time" class="text-3xl">00:00:00</p>
+    <p id="Day" class="text-3xl">Montag</p>
+    <p id="Date" class="text-3xl">01.01.2000</p>
+
+    <ul id="LinkList" class="flex"></ul>
+
+    <div id="Aurum" class="w-full max-w-6xl px-5 hidden">
+      <div class="flex justify-evenly p-2 bg-black/80 rounded-xl">
+        <p id="Aurum_Balance">Balance: 200 €</p>
+        <p id="Aurum_Equity">Equity: 300 €</p>
+        <p id="Aurum_Profit">Profit: 230 €</p>
+        <p id="Aurum_Positions">Positions: 3</p>
+        <p id="Aurum_Orders">Orders: 0</p>
+        <a
+          id="Aurum_Insight"
+          class="flex items-center hover:border-b cursor-pointer"
+        >
+          <p class="mr-1">Insight</p>
+          <i class="fa-solid fa-arrow-up-right-from-square fa-sm"></i>
+        </a>
+      </div>
+      <ul id="AurumExperts" class="flex justify-evenly pt-2"></ul>
+    </div>
+  </body>
 </html>
