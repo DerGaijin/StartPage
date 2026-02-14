@@ -63,6 +63,10 @@ const Content = {
           Label: "Aniwatch",
           URL: "https://aniwatchtv.to",
         },
+        {
+          Label: "Filmpalast",
+          URL: "https://filmpalast.to/",
+        },
       ],
     },
   ],
