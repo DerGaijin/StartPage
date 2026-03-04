@@ -64,8 +64,8 @@ const Content = {
           URL: "https://aniwatchtv.to",
         },
         {
-          Label: "Filmpalast",
-          URL: "https://filmpalast.to/",
+          Label: "Megakino",
+          URL: "https://megakino1.cx/",
         },
       ],
     },
