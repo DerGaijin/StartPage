@@ -1,323 +1,75 @@
-const Content = {
-  Links: [
-    {
-      Label: "Google",
-      Links: [
-        {
-          Label: "Youtube",
-          URL: "https://www.youtube.de",
-        },
-        {
-          Label: "Google",
-          URL: "https://www.google.de",
-        },
-        {
-          Label: "GMail",
-          URL: "https://mail.google.com",
-        },
-        {
-          Label: "Tabellen",
-          URL: "https://docs.google.com/spreadsheets/",
-          Icon: "https://cdn-icons-png.flaticon.com/512/5968/5968557.png",
-        },
-        {
-          Label: "Dokumente",
-          URL: "https://docs.google.com/document/",
-          Icon: "https://cdn-icons-png.flaticon.com/512/5968/5968517.png",
-        },
-      ],
-    },
-    {
-      Label: "Programmieren",
-      Links: [
-        {
-          Label: "Github",
-          URL: "https://www.github.com",
-        },
-        {
-          Label: "ChatGPT",
-          URL: "https://www.chatgpt.com",
-        },
-        {
-          Label: "Overleaf",
-          URL: "https://de.overleaf.com",
-        },
-      ],
-    },
-    {
-      Label: "Unterhaltung",
-      Links: [
-        {
-          Label: "Serien",
-          URL: "https://serienstream.to",
-        },
-        {
-          Label: "Serien",
-          URL: "https://bs.to",
-        },
-        {
-          Label: "Aniworld",
-          URL: "https://aniworld.to",
-        },
-        {
-          Label: "Aniwatch",
-          URL: "https://aniwatchtv.to",
-        },
-        {
-          Label: "Megakino",
-          URL: "https://megakino1.cx/",
-        },
-      ],
-    },
-  ],
-};
-
 document.addEventListener("DOMContentLoaded", () => {
-  UpdateDateTime();
-  UpdateLinks();
-  UpdateAurum();
-  setInterval(UpdateDateTime, 500);
+    document.querySelector("#link-groups").innerHTML = startPageContent.LinkGroups.map(
+        ({ Label, Links }, i) =>
+            `<section class="${i ? "border-l " : ""}border-white/15 px-[clamp(8px,2vw,24px)] py-4"><h2 class="mb-2 font-mono text-[0.65rem] font-normal tracking-[0.14em] text-[#a5a7ac] uppercase">${Label}</h2><ul class="grid list-none gap-0.5 p-0">${Links.map(({ Label, URL, Icon }) => `<li><a class="group grid min-h-10 grid-cols-[32px_minmax(0,1fr)] items-center gap-2 px-1 py-1 text-sm transition duration-150 hover:bg-white/8 hover:text-[#f4f2ed] active:scale-[0.99] active:bg-white/12 focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#d6c7a1] max-[520px]:grid-cols-[28px_minmax(0,1fr)] max-[520px]:px-0 max-[520px]:text-xs" href="${URL}"><span class="grid size-8 place-items-center border border-white/15 bg-white/4 font-mono text-[0.6rem] text-[#d6c7a1] transition-colors group-hover:border-[#d6c7a1]/50 group-hover:bg-[#d6c7a1]/10 group-hover:text-[#f2d58b] max-[520px]:size-7" aria-hidden="true"><img class="size-5" src="${Icon || `https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${URL}&size=256`}" alt=""></span><span class="truncate">${Label}</span></a></li>`).join("")}</ul></section>`,
+    ).join("");
+
+    const time = document.querySelector("time");
+    const [weekday, date] = document.querySelectorAll('[aria-label="Datum und Uhrzeit"] p');
+
+    function updateTime() {
+        const now = new Date();
+        time.textContent = now.toLocaleTimeString("de-DE");
+        weekday.textContent = now.toLocaleDateString("de-DE", { weekday: "long" });
+        date.textContent = now.toLocaleDateString("de-DE");
+    }
+
+    updateTime();
+    setInterval(updateTime, 1000);
+
+    const searchForm = document.querySelector("#search-form");
+    const searchQuery = document.querySelector("#search-query");
+    const searchEngine = document.querySelector("#search-engine");
+    const searchEngines = {
+        google: "https://www.google.com/search?q=",
+        duckduckgo: "https://duckduckgo.com/?q=",
+        brave: "https://search.brave.com/search?q=",
+        bing: "https://www.bing.com/search?q=",
+    };
+    searchForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const query = searchQuery.value.trim();
+        if (query) window.location.assign(searchEngines[searchEngine.value] + encodeURIComponent(query));
+    });
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "/" && document.activeElement !== searchQuery && document.activeElement.tagName !== "INPUT") {
+            event.preventDefault();
+            searchQuery.focus();
+        }
+    });
+
+    const serverAddress = document.querySelector("#server-address");
+    const secondaryServerAddress = document.querySelector("#server-address-secondary");
+    const serverAddressToggle = document.querySelector("#server-address-toggle");
+    const secondaryServerAddressToggle = document.querySelector("#server-address-secondary-toggle");
+    const serverPanel = document.querySelector("#server-panel");
+    const serverPanelOpen = document.querySelector("#server-panel-open");
+    const serverPanelClose = document.querySelector("#server-panel-close");
+
+    function setServerPanel(isOpen) {
+        serverPanel.classList.toggle("hidden", !isOpen);
+        serverPanelOpen.classList.toggle("hidden", isOpen);
+        serverPanelOpen.setAttribute("aria-expanded", String(isOpen));
+        serverPanel.toggleAttribute("inert", !isOpen);
+        (isOpen ? serverAddress : serverPanelOpen).focus();
+    }
+
+    serverPanelOpen.addEventListener("click", () => setServerPanel(true));
+    serverPanelClose.addEventListener("click", () => setServerPanel(false));
+    function toggleServerAddressVisibility(address, toggle) {
+        const isHidden = address.type === "password";
+        address.type = isHidden ? "text" : "password";
+        toggle.setAttribute("aria-pressed", String(isHidden));
+        toggle.setAttribute("aria-label", isHidden ? "IP-Adresse verbergen" : "IP-Adresse anzeigen");
+    }
+
+    serverAddressToggle.addEventListener("click", () => {
+        toggleServerAddressVisibility(serverAddress, serverAddressToggle);
+    });
+    secondaryServerAddressToggle.addEventListener("click", () => {
+        toggleServerAddressVisibility(secondaryServerAddress, secondaryServerAddressToggle);
+    });
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && !serverPanel.classList.contains("hidden")) setServerPanel(false);
+    });
 });
-
-function PrettyPrice(Price, Prefix = true, Fixed = 2) {
-  Result = parseFloat(Price).toFixed(Fixed);
-  if (Prefix && Result >= 0.0) {
-    return "+" + Result + " €";
-  }
-  return Result + " €";
-}
-
-function PrettyNumber(Number) {
-  return Number <= 9 ? "0" + Number : Number;
-}
-
-function DoRequest(Path) {
-  var xmlHttp = new XMLHttpRequest();
-  xmlHttp.open("GET", Path, false);
-  xmlHttp.send(null);
-  try {
-    return JSON.parse(xmlHttp.responseText);
-  } catch (error) {
-    return null;
-  }
-}
-
-function UpdateDateTime() {
-  const Now = new Date();
-
-  document.getElementById("Time").innerText =
-    PrettyNumber(Now.getHours()) +
-    ":" +
-    PrettyNumber(Now.getMinutes()) +
-    ":" +
-    PrettyNumber(Now.getSeconds());
-
-  var DayStr = "";
-  if (Now.getDay() == 0) {
-    DayStr = "Sonntag";
-  } else if (Now.getDay() == 1) {
-    DayStr = "Montag";
-  } else if (Now.getDay() == 2) {
-    DayStr = "Dienstag";
-  } else if (Now.getDay() == 3) {
-    DayStr = "Mittwoch";
-  } else if (Now.getDay() == 4) {
-    DayStr = "Donnerstag";
-  } else if (Now.getDay() == 5) {
-    DayStr = "Freitag";
-  } else if (Now.getDay() == 6) {
-    DayStr = "Samstag";
-  }
-  document.getElementById("Day").innerText = DayStr;
-
-  document.getElementById("Date").innerText =
-    PrettyNumber(Now.getDate()) +
-    "." +
-    PrettyNumber(Now.getMonth() + 1) +
-    "." +
-    Now.getFullYear();
-}
-
-function UpdateLinks() {
-  var LinkList = document.getElementById("LinkList");
-  LinkList.innerHTML = "";
-
-  for (var LinkGroup of Content.Links) {
-    var GroupElement = document.createElement("div");
-    GroupElement.className = "mx-5";
-    LinkList.appendChild(GroupElement);
-
-    if ("Label" in LinkGroup) {
-      var GroupLabel = document.createElement("p");
-      GroupLabel.className = "w-full mb-2 text-xl text-center hidden";
-      GroupLabel.innerText = LinkGroup.Label;
-      GroupElement.appendChild(GroupLabel);
-    }
-
-    if ("Links" in LinkGroup) {
-      var LinkItems = document.createElement("ul");
-      LinkItems.className = "grid grid-cols-2 gap-4";
-      GroupElement.appendChild(LinkItems);
-
-      var Links = LinkGroup["Links"];
-      for (var Link of Links) {
-        var LinkItem = document.createElement("a");
-        LinkItem.className =
-          "LinkItem w-25 h-25 flex flex-col items-center justify-center";
-        if ("URL" in Link) {
-          LinkItem.href = Link.URL;
-        }
-
-        var IconURL = LinkItem.href;
-        var LinkIcon = document.createElement("img");
-        LinkIcon.className = "w-12 h-12";
-        if ("Icon" in Link) {
-          LinkIcon.src = Link.Icon;
-        } else {
-          LinkIcon.src =
-            "https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=" +
-            IconURL +
-            "&size=256";
-        }
-        LinkItem.appendChild(LinkIcon);
-
-        if ("Label" in Link) {
-          var LinkLabel = document.createElement("p");
-          LinkLabel.className = "";
-          LinkLabel.innerText = Link.Label;
-          LinkItem.appendChild(LinkLabel);
-        }
-
-        LinkItems.appendChild(LinkItem);
-      }
-    }
-  }
-}
-
-function UpdateAurum() {
-  var AurumExperts = document.getElementById("AurumExperts");
-  AurumExperts.innerHTML = "";
-
-  const Endpoint = localStorage.getItem("Aurum");
-  if (Endpoint == null) {
-    return;
-  }
-
-  const PAccount = fetch(Endpoint + "/account_info");
-  const PExperts = fetch(Endpoint + "/experts");
-  const PPositions = fetch(Endpoint + "/positions_get");
-  const POrders = fetch(Endpoint + "/orders_get");
-  var PDeals = [];
-  var Today = new Date();
-  for (let Idx = 0; Idx < 4; Idx++) {
-    var MonthDate = new Date(Today.getFullYear(), Today.getMonth() - Idx);
-    const StartParam = new Date(
-      MonthDate.getFullYear(),
-      MonthDate.getMonth(),
-      1,
-      0,
-      0,
-      0,
-      0
-    ).toISOString();
-    const StopParam = new Date(
-      MonthDate.getFullYear(),
-      MonthDate.getMonth() + 1,
-      0,
-      23,
-      59,
-      59,
-      999
-    ).toISOString();
-    var Deals = fetch(
-      Endpoint + "/history_deals_get?Start=" + StartParam + "&Stop=" + StopParam
-    );
-    PDeals.push(Deals);
-  }
-
-  Promise.all([PAccount, PExperts, PPositions, POrders, ...PDeals]).then(
-    async (Values) => {
-      var Account = await Values[0].json();
-      var Experts = await Values[1].json();
-      var Positions = await Values[2].json();
-      var Orders = await Values[3].json();
-      var MonthlyDeals = [];
-      for (var Idx = 4; Idx < Values.length; Idx++) {
-        MonthlyDeals.push(await Values[Idx].json());
-      }
-
-      document.getElementById("Aurum").classList.remove("hidden");
-      document.getElementById("Aurum_Balance").innerText =
-        "Balance: " + PrettyPrice(Account.balance, false);
-      document.getElementById("Aurum_Equity").innerText =
-        "Equity: " + PrettyPrice(Account.equity, false);
-      document.getElementById("Aurum_Profit").innerText =
-        "Profit: " + PrettyPrice(Account.profit);
-      document.getElementById("Aurum_Positions").innerText =
-        "Positions: " + Positions.length;
-      document.getElementById("Aurum_Orders").innerText =
-        "Orders: " + Orders.length;
-      document.getElementById("Aurum_Insight").href =
-        Endpoint + "/Insight.html";
-
-      for (const Expert of Experts) {
-        var ExpertElem = document.createElement("li");
-        ExpertElem.className = "ExpertCard min-w-40 p-2 border";
-        AurumExperts.appendChild(ExpertElem);
-
-        var NameElem = document.createElement("h3");
-        NameElem.className = "text-center";
-        NameElem.innerText = Expert.Name;
-        ExpertElem.appendChild(NameElem);
-
-        function AddMonthRow(Month, Profit) {
-          var Row = document.createElement("div");
-          Row.className = "flex justify-between";
-          ExpertElem.appendChild(Row);
-
-          var Elem1 = document.createElement("p");
-          Elem1.innerText = Month;
-          Row.appendChild(Elem1);
-
-          var Elem2 = document.createElement("p");
-          Elem2.innerText = PrettyPrice(Profit);
-          Row.appendChild(Elem2);
-
-          if (Profit > 0) {
-            Elem2.classList.add("text-green-500");
-          } else if (Profit < 0) {
-            Elem2.classList.add("text-red-500");
-          }
-        }
-
-        var Today = new Date();
-        for (let Idx = 0; Idx < 4; Idx++) {
-          var MonthDate = new Date(Today.getFullYear(), Today.getMonth() - Idx);
-
-          var Profit = 0;
-          if (Idx == 0) {
-            for (const Position of Positions) {
-              if (Position.magic == Expert.MagicNumber) {
-                Profit += Position.profit + Position.swap;
-              }
-            }
-          }
-
-          for (const Deal of MonthlyDeals[Idx]) {
-            if (Deal.magic == Expert.MagicNumber) {
-              Profit += Deal.profit + Deal.swap + Deal.commission;
-            }
-          }
-
-          AddMonthRow(
-            (MonthDate.getMonth() + 1 <= 9 ? "0" : "") +
-              (MonthDate.getMonth() + 1) +
-              "." +
-              MonthDate.getFullYear(),
-            Profit
-          );
-        }
-      }
-    }
-  );
-}
