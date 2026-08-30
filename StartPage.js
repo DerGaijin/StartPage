@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const now = new Date();
         time.textContent = now.toLocaleTimeString("de-DE");
         weekday.textContent = now.toLocaleDateString("de-DE", { weekday: "long" });
-        date.textContent = now.toLocaleDateString("de-DE");
+        date.textContent = now.toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric" });
     }
 
     updateTime();
@@ -42,6 +42,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const secondaryServerAddress = document.querySelector("#server-address-secondary");
     const serverAddressToggle = document.querySelector("#server-address-toggle");
     const secondaryServerAddressToggle = document.querySelector("#server-address-secondary-toggle");
+    const progressBox = document.querySelector("#progress-box");
+    const tradingBox = document.querySelector("#trading-box");
+    const statusTitle = document.querySelector("#program-progress-heading");
+    const statusDetail = document.querySelector("#status-detail");
+    const statusPercent = document.querySelector("#status-percent");
+    const statusIndicator = document.querySelector("#status-indicator");
+    const statusProgress = document.querySelector("#status-progress");
+    const statusProgressbar = document.querySelector("#status-progressbar");
     const serverPanel = document.querySelector("#server-panel");
     const serverPanelOpen = document.querySelector("#server-panel-open");
     const serverPanelClose = document.querySelector("#server-panel-close");
@@ -69,6 +77,106 @@ document.addEventListener("DOMContentLoaded", () => {
     secondaryServerAddressToggle.addEventListener("click", () => {
         toggleServerAddressVisibility(secondaryServerAddress, secondaryServerAddressToggle);
     });
+
+    function updateResearchStatus(data) {
+        const total = Number(data.runs_total) || 0;
+        const complete = Number(data.runs_complete) || 0;
+        const state = String(data.state || "starting");
+        const labels = {
+            data_validation: "Validating data",
+            forward_test: "Walk-forward testing",
+            real_backtest: "Running real-tick backtest",
+            starting: "Starting research",
+        };
+        let currentProgress = 0;
+
+        if (state === "forward_test") {
+            const forwardTotal = Number(data.forward_total) || 0;
+            currentProgress = forwardTotal ? (Number(data.forward_completed) || 0) / forwardTotal : 0;
+        } else if (state === "real_backtest") {
+            currentProgress = 1;
+        }
+
+        const value = total ? Math.min(100, ((complete + currentProgress) / total) * 100) : 0;
+        const scope = data.symbol && data.timeframe ? `${data.symbol} ${data.timeframe}` : "Preparing run";
+        const subProgress = state === "forward_test" ? `, window ${Number(data.forward_completed) || 0}/${Number(data.forward_total) || 0}` : "";
+
+        statusTitle.textContent = labels[state] || state.replace(/_/g, " ");
+        statusDetail.textContent = `${scope} | run ${complete}/${total || "?"}${subProgress}`;
+        statusPercent.textContent = total ? `${Math.round(value)}%` : "Starting";
+        statusIndicator.className = "size-2 shrink-0 rounded-full bg-[#d6c7a1] animate-pulse";
+        statusProgress.style.width = `${value}%`;
+        statusProgressbar.setAttribute("aria-valuenow", String(value));
+        statusProgressbar.setAttribute("aria-label", `Research progress: ${statusTitle.textContent}`);
+    }
+
+    async function fetchResearchStatus(endpoint) {
+        try {
+            const response = await fetch(endpoint, { cache: "no-store" });
+            if (!response.ok) throw new Error(`Status request failed: ${response.status}`);
+            const data = await response.json();
+            if (data.Error) throw new Error(data.Error);
+            if (serverAddress.value.trim() !== endpoint) return;
+
+            updateResearchStatus(data);
+            progressBox.hidden = false;
+        } catch (error) {
+            if (serverAddress.value.trim() !== endpoint) return;
+
+            progressBox.hidden = true;
+        }
+    }
+
+    function connectProgressEndpoint() {
+        serverAddress.value = localStorage.getItem("progress-endpoint") || "";
+
+        function fetchSavedEndpoint() {
+            const endpoint = serverAddress.value.trim();
+            localStorage.setItem("progress-endpoint", endpoint);
+            progressBox.hidden = true;
+            if (endpoint) fetchResearchStatus(endpoint);
+        }
+
+        serverAddress.addEventListener("input", () => {
+            localStorage.setItem("progress-endpoint", serverAddress.value.trim());
+            progressBox.hidden = true;
+        });
+        serverAddress.addEventListener("change", fetchSavedEndpoint);
+        fetchSavedEndpoint();
+    }
+
+    function connectEndpoint(address, box, storageKey) {
+        let controller;
+        let timeout;
+
+        async function fetchEndpoint() {
+            const endpoint = address.value.trim();
+            localStorage.setItem(storageKey, endpoint);
+            box.hidden = true;
+            controller?.abort();
+
+            if (!endpoint) return;
+
+            controller = new AbortController();
+            try {
+                const response = await fetch(endpoint, { signal: controller.signal });
+                if (response.ok && address.value.trim() === endpoint) box.hidden = false;
+            } catch (error) {
+                if (error.name !== "AbortError") box.hidden = true;
+            }
+        }
+
+        address.value = localStorage.getItem(storageKey) || "";
+        address.addEventListener("input", () => {
+            box.hidden = true;
+            clearTimeout(timeout);
+            timeout = setTimeout(fetchEndpoint, 500);
+        });
+        fetchEndpoint();
+    }
+
+    connectProgressEndpoint();
+    connectEndpoint(secondaryServerAddress, tradingBox, "trading-endpoint");
     document.addEventListener("keydown", (event) => {
         if (event.key === "Escape" && !serverPanel.classList.contains("hidden")) setServerPanel(false);
     });
